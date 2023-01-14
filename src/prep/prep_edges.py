@@ -1,5 +1,5 @@
 """
-Converts edge relationships (e.g., bought together, also bought) to numeric weights between two nodes.
+Converts edge relationships (e.g., viewed together, also bought) to numeric weights between two nodes.
 """
 import argparse
 
@@ -8,9 +8,8 @@ import pandas as pd
 
 from src.utils.logger import logger
 
-relationship_weights = {'bought_together': 1.2,
-                        'also_bought': 1.0,
-                        'also_viewed': 0.5}
+relationship_weights = {'also_buy': 1.0,
+                        'also_view': 0.5}
 
 
 def create_product_pair(df, col_list):
@@ -72,7 +71,7 @@ if __name__ == '__main__':
                         default=None)
     args = parser.parse_args()
 
-    df = pd.read_csv(args.read_path, error_bad_lines=False, warn_bad_lines=True,
+    df = pd.read_csv(args.read_path, on_bad_lines='warn',
                      dtype={'asin': 'str', 'related': 'str'})
     logger.info('DF shape: {}'.format(df.shape))
 
