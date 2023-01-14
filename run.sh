@@ -1,5 +1,5 @@
 ### Workflow for books
-docker-compose run app python3 -m src.parse.parse_json data/meta_Books.json.gz data/books.csv
+docker-compose run app python3 -m src.parse.parse_json data/raw/meta_Books.json.gz data/interim/books.csv
 
 python -m src.prep.prep_node_relationship data/books.csv data/books_relationships.csv
 python -m src.prep.prep_meta data/books.csv data/books_meta.csv

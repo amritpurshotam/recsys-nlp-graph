@@ -126,7 +126,6 @@ dmypy.json
 .pyre/
 
 # Data
-data/
 model/
 results/
 *.zip
