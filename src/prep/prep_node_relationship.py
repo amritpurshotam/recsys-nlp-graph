@@ -2,6 +2,7 @@
 Parses item to item relationships in 'related' field and explodes it such that each relationship is a single row.
 """
 import argparse
+import ast
 
 import numpy as np
 import pandas as pd
@@ -9,30 +10,10 @@ import pandas as pd
 from src.utils.logger import logger
 
 
-def get_also_bought_count(related):
-    try:
-        return len(related['also_bought'])
-    except KeyError:
-        return -1
-
-
-def explode_on_related(df: pd.DataFrame, relationship: str) -> pd.DataFrame:
-    # Filter on relationship
-    df = df[df['related'].apply(lambda x: relationship in x.keys())].copy()
-
-    # Get value (list) from relationship dict
-    df['related'] = df['related'].apply(lambda x: x[relationship])
-
-    # Explode efficiently using numpy
-    vals = df['related'].values.tolist()
-    lens = [len(val_list) for val_list in vals]
-    vals_array = np.repeat(df['asin'], lens)
-    exploded_df = pd.DataFrame(np.column_stack((vals_array, np.concatenate(vals))), columns=df.columns)
-
-    # Add relationship
+def explode_on(df: pd.DataFrame, relationship: str) -> pd.DataFrame:
+    exploded_df = df[['asin', relationship]].explode(relationship)
+    exploded_df = exploded_df.rename({relationship: "related"}, axis=1)
     exploded_df['relationship'] = relationship
-    logger.info('Exploded for relationship: {}'.format(relationship))
-
     return exploded_df
 
 
@@ -47,30 +28,30 @@ def get_node_relationship(df: pd.DataFrame) -> pd.DataFrame:
 
     """
     # Keep only rows with related data
-    df = df[~df['related'].isnull()].copy()
-    logger.info('DF shape after dropping empty related: {}'.format(df.shape))
+    df = df[~df['also_buy'].isnull()].copy()
+    df = df[~df['also_view'].isnull()].copy()
+    logger.info('DF shape after dropping empty also_buy and also_view: {}'.format(df.shape))
 
     df = df[~df['title'].isnull()].copy()
     logger.info('DF shape after dropping empty title: {}'.format(df.shape))
-    df = df[['asin', 'related']].copy()
+    df = df[['asin', 'also_buy', 'also_view']].copy()
 
-    # Evaluate related str into dict
-    df['related'] = df['related'].apply(eval)
-    logger.info('Completed eval on "related" string')
+    # Evaluate str columns into lists
+    df['also_buy'] = df['also_buy'].apply(ast.literal_eval)
+    df['also_view'] = df['also_view'].apply(ast.literal_eval)
+    logger.info('Completed eval on "also_buy" and "also_view" string')
 
-    # Exclude products where also bought relationships less than 2
-    df['also_bought_count'] = df['related'].apply(get_also_bought_count)
-    df = df[df['also_bought_count'] >= 2].copy()
+    # Exclude products where also_buy relationship less than 2 at least one view
+    df = df[df['also_buy'].str.len() >= 2].copy()
+    df = df[df['also_view'].str.len() >= 1].copy()
     logger.info('DF shape after dropping products with <2 edges: {}'.format(df.shape))
-    df.drop(columns='also_bought_count', inplace=True)
 
     # Explode columns
-    bought_together_df = explode_on_related(df, relationship='bought_together')
-    also_bought_df = explode_on_related(df, relationship='also_bought')
-    also_viewed_df = explode_on_related(df, relationship='also_viewed')
+    also_buy_df = explode_on(df, relationship='also_buy')
+    also_view_df = explode_on(df, relationship='also_view')
 
     # Concatenate df
-    combined_df = pd.concat([bought_together_df, also_bought_df, also_viewed_df], axis=0)
+    combined_df = pd.concat([also_buy_df, also_view_df], axis=0)
     logger.info('Distribution of relationships: \n{}'.format(combined_df['relationship'].value_counts()))
 
     return combined_df
@@ -82,8 +63,14 @@ if __name__ == '__main__':
     parser.add_argument('write_path', type=str, help='Path to output csv (of nodes relationships)')
     args = parser.parse_args()
 
-    df = pd.read_csv(args.read_path, error_bad_lines=False, warn_bad_lines=True,
-                     dtype={'asin': 'str', 'title': 'str', 'brand': 'str'})
+    df = pd.read_csv(
+        args.read_path,
+        on_bad_lines='warn',
+        usecols=['asin', 'also_buy', 'also_view', 'title'],
+        dtype={
+            'asin': 'str',
+            'title': 'str'
+        })
     logger.info('DF shape: {}'.format(df.shape))
 
     exploded_df = get_node_relationship(df)
