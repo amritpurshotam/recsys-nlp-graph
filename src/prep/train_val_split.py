@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from src.config import DATA_PATH
+from src.config import PROC_DATA_PATH, INT_DATA_PATH
 from src.prep.prep_edges import create_product_pair
 from src.utils.logger import logger
 
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     parser.add_argument('val_prop', type=float, help='Proportion of validation set (e.g., 0.33)')
     args = parser.parse_args()
 
-    df = pd.read_csv(args.read_path, error_bad_lines=False, warn_bad_lines=True,
+    df = pd.read_csv(args.read_path, on_bad_lines='warn',
                      dtype={'product1': 'str', 'product2': 'str'})
     logger.info('DF shape: {}'.format(df.shape))
 
@@ -157,10 +157,10 @@ if __name__ == '__main__':
 
     # Save to train, val, and train edgelist
     input_filename = Path(args.read_path).resolve().stem
-    train.to_csv('{}/{}_train.csv'.format(DATA_PATH, input_filename), index=False)
-    logger.info('Train saved as: {}/{}_train.csv'.format(DATA_PATH, input_filename))
-    val.to_csv('{}/{}_val.csv'.format(DATA_PATH, input_filename), index=False)
-    logger.info('Val saved as: {}/{}_val.csv'.format(DATA_PATH, input_filename))
+    train.to_csv(f'{PROC_DATA_PATH}/{input_filename}_train.csv', index=False)
+    logger.info(f'Train saved as: {PROC_DATA_PATH}/{input_filename}_train.csv')
+    val.to_csv(f'{PROC_DATA_PATH}/{input_filename}_val.csv', index=False)
+    logger.info(f'Val saved as: {PROC_DATA_PATH}/{input_filename}_val.csv')
 
-    train.to_csv('{}/{}_train.edgelist'.format(DATA_PATH, input_filename), sep=' ', index=False, header=False)
-    logger.info('Train edgelist saved as: {}/{}_train.edgelist'.format(DATA_PATH, input_filename))
+    train.to_csv(f'{INT_DATA_PATH}/{input_filename}_train.edgelist', sep=' ', index=False, header=False)
+    logger.info(f'Train edgelist saved as: {INT_DATA_PATH}/{input_filename}_train.edgelist')
