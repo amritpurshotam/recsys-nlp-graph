@@ -28,7 +28,7 @@ def parse_json_to_df(path: str) -> pd.DataFrame:
         if i % 10000 == 0:
             logger.info('Rows processed: {:,}'.format(i))
 
-    df = pd.DataFrame.from_dict(df_dict, orient='index', columns=["asin", "also_buy", "also_view"])
+    df = pd.DataFrame.from_dict(df_dict, orient='index', columns=["asin", "title", "also_buy", "also_view"])
 
     # Lowercase
     df['also_buy'] = df['also_buy'].astype(str)
