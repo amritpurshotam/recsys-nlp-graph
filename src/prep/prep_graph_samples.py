@@ -9,7 +9,7 @@ import networkx
 import numpy as np
 import scipy as sp
 
-from src.config import DATA_PATH
+from src.config import PROC_DATA_PATH
 from src.utils.io_utils import save_model
 from src.utils.logger import logger
 
@@ -35,7 +35,7 @@ def create_transition_matrix(graph):
     Returns:
 
     """
-    adjacency_mat = networkx.adj_matrix(graph)
+    adjacency_mat = networkx.adjacency_matrix(graph)
     logger.info('Adjacency matrix shape: {}'.format(adjacency_mat.shape))
     graph = None
 
@@ -127,8 +127,8 @@ if __name__ == '__main__':
     logger.info('Sample array saved to {}'.format(args.write_path))
     sample_array = None
 
-    save_model(node_dict, '{}/{}_node_dict.tar.gz'.format(DATA_PATH, args.graph_name))
+    save_model(node_dict, '{}/{}_node_dict.tar.gz'.format(PROC_DATA_PATH, args.graph_name))
     node_dict = None
 
-    save_model(transition_dict, '{}/{}_transition_dict.tar.gz'.format(DATA_PATH, args.graph_name))
+    save_model(transition_dict, '{}/{}_transition_dict.tar.gz'.format(PROC_DATA_PATH, args.graph_name))
     transition_dict = None

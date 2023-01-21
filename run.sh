@@ -7,7 +7,7 @@ python -m src.prep.prep_meta data/books.csv data/books_meta.csv
 docker-compose run app python3 -m src.prep.prep_edges data/interim/books_relationships.csv data/interim/books_edges.csv
 docker-compose run app python3 -m src.prep.train_val_split data/interim/books_edges.csv 0.33
 
-python -m src.prep.prep_graph_samples data/books_edges_train.edgelist data/books_sequences.npy books
+docker-compose run app python3 -m src.prep.prep_graph_samples data/interim/books_edges_train_dev.edgelist data/processed/books_sequences_dev.npy books
 
 # Slow and requires a lot of ram
 python -m src.ml.train_node2vec_embeddings data/books_edges_train.edgelist data/books_embeddings.kv
