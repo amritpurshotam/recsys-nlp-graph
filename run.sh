@@ -7,7 +7,7 @@ python -m src.prep.prep_meta data/books.csv data/books_meta.csv
 docker-compose run app python3 -m src.prep.prep_edges data/interim/books_relationships.csv data/interim/books_edges.csv
 docker-compose run app python3 -m src.prep.train_val_split data/interim/books_edges.csv 0.33
 
-docker-compose run app python3 -m src.prep.prep_graph_samples data/interim/books_edges_train_dev.edgelist data/processed/books_sequences_dev.npy books
+docker-compose run app python3 -m src.prep.prep_graph_samples data/interim/books_edges_train.edgelist data/processed/books_sequences.npy books
 
 # Slow and requires a lot of ram
 python -m src.ml.train_node2vec_embeddings data/books_edges_train.edgelist data/books_embeddings.kv
@@ -19,19 +19,19 @@ python -m src.ml.train_gensim_embedding data/books_sequences_sample.npy 8
 # For dev testing
 python -m src.ml.train_torch_embedding data/books_sequences_sample.npy data/books_edges_val_samp.csv data/books_edges_train_samp.csv 32 4
 # For training
-python -m src.ml.train_torch_embedding data/books_sequences.npy data/books_edges_val.csv data/books_edges_val_samp.csv 128 10  # Best params?
+docker-compose run app python3 -m src.ml.train_torch_embedding data/processed/books_sequences.npy data/processed/books_edges_val.csv data/processed/books_edges_val.csv 128 10  # Best params?
 
 # ==========================================================================================================================================
 ### Workflow for electronics
-python -m src.parse.parse_json data/meta_Electronics.json.gz data/electronics.csv
+docker-compose run app python3 -m src.parse.parse_json data/raw/meta_Electronics.json.gz data/interim/electronics.csv
 
-python -m src.prep.prep_node_relationship data/electronics.csv data/electronics_relationships.csv
+docker-compose run app python3 -m src.prep.prep_node_relationship data/interim/electronics.csv data/interim/electronics_relationships.csv
 python -m src.prep.prep_meta data/electronics.csv data/electronics_meta.csv
 
-python -m src.prep.prep_edges data/electronics_relationships.csv data/electronics_edges.csv
-python -m src.prep.train_val_split data/electronics_edges.csv 0.33
+docker-compose run app python3 -m src.prep.prep_edges data/interim/electronics_relationships.csv data/interim/electronics_edges.csv
+docker-compose run app python3 -m src.prep.train_val_split data/interim/electronics_edges.csv 0.33
 
-python -m src.prep.prep_graph_samples data/electronics_edges_train.edgelist data/electronics_sequences.npy electronics
+docker-compose run app python3 -m src.prep.prep_graph_samples data/interim/electronics_edges_train.edgelist data/processed/electronics_sequences.npy electronics
 
 # Slow and requires a lot of ram
 python -m src.ml.train_node2vec_embeddings data/electronics_edges_train.edgelist data/electronics_embeddings.kv
@@ -44,7 +44,7 @@ python -m src.ml.train_gensim_embedding data/electronics_sequences_sample.npy 6
 python -m src.ml.train_torch_embedding data/electronics_sequences_samp.npy data/electronics_edges_val_samp.csv data/electronics_edges_train_samp.csv 32 4
 python -m src.ml.train_torch_embedding_with_meta data/electronics_sequences_samp.npy data/electronics_edges_val_samp.csv data/electronics_meta.csv data/electronics_edges_train_samp.csv 32 4
 # For training
-python -m src.ml.train_torch_embedding data/electronics_sequences.npy data/electronics_edges_val.csv  data/electronics_edges_val_samp.csv 128 4  # Best params?
+docker-compose run app python3 -m src.ml.train_torch_embedding data/processed/electronics_sequences.npy data/processed/electronics_edges_val.csv  data/processed/electronics_edges_val.csv 128 4  # Best params?
 python -m src.ml.train_torch_embedding_with_meta data/electronics_sequences.npy data/electronics_edges_val.csv data/electronics_meta.csv data/electronics_edges_val_samp.csv 128 10  # Best params?
 
 # MF Dev
