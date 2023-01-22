@@ -21,7 +21,7 @@ initial_lr = 0.025
 
 # Torch parameters
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-torch.cuda.set_device(1)  # Set to use 2nd GPU
+# torch.cuda.set_device(0)  # Set to use 2nd GPU
 logger.info('Device: {}, emb_dim: {}, epochs: {}, initial_lr: {}'.format(device, emb_dim, epochs, initial_lr))
 
 if __name__ == '__main__':
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     results = []
     start_time = datetime.datetime.now()
     for epoch in range(epochs):
-        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, len(dataloader))
+        scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, len(dataloader))
         running_loss = 0
 
         # Training loop
