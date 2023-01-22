@@ -1,7 +1,8 @@
 FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
 
+# installs python 3.10.6 at time of writing
 RUN apt-get update -y
-RUN apt-get -y install python3 \
+RUN apt-get -y install python3 \ 
     && apt-get -y install python3-pip
 
 WORKDIR /app/
