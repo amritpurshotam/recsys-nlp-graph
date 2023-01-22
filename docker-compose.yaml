@@ -13,3 +13,4 @@ services:
     volumes:
       - ./src:/app/src
       - ./data:/app/data
+      - ./model:/app/model
