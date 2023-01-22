@@ -262,7 +262,7 @@ class SequencesDataset(Dataset):
         centers = [center for center, _ in pairs_batch]
         contexts = [context for _, context in pairs_batch]
 
-        return torch.LongTensor(centers), torch.LongTensor(contexts), torch.LongTensor(neg_contexts)
+        return torch.LongTensor(np.array(centers)), torch.LongTensor(np.array(contexts)), torch.LongTensor(np.array(neg_contexts))
 
     @staticmethod
     def collate_for_mf(batches):
